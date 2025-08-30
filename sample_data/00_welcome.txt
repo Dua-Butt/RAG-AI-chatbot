@@ -1,0 +1,6 @@
+Welcome to ACME Corp!
+
+This repository powers an internal chatbot that answers questions using our company docs.
+Use it to find policies, product details, and onboarding information.
+
+For private data safety, everything runs locally on your machine. No cloud keys required.

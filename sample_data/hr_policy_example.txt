@@ -1,0 +1,7 @@
+ACME HR Policy (Excerpt)
+
+- Working hours: 9:00 AM to 5:00 PM, Monday to Friday.
+- Remote work: Employees may work remotely up to 2 days per week with manager approval.
+- Leave: Annual leave entitlement is 18 business days. Submit requests via the HR portal.
+- Travel: All travel must be booked through the corporate travel desk.
+- IT Help: Email helpdesk@acme.example for urgent support. Average response time: 4 business hours.

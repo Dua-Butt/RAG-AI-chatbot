@@ -1,0 +1,35 @@
+services:
+  ollama:
+    image: ollama/ollama:latest
+    container_name: ollama
+    ports:
+      - "11434:11434"
+    volumes:
+      - ollama:/root/.ollama
+    healthcheck:
+      test: ["CMD", "ollama", "list"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+
+  app:
+    build: .
+    container_name: ai-flask-rag
+    ports:
+      - "5000:5000"
+    environment:
+      - FLASK_SECRET=${FLASK_SECRET:-dev-secret-change-me}
+      - OLLAMA_HOST=http://ollama:11434  # ← use host's Ollama
+      - CHAT_MODEL=${CHAT_MODEL:-llama3.2:3b}
+      - EMBEDDING_MODEL=${EMBEDDING_MODEL:-nomic-embed-text}
+      - COLLECTION_NAME=${COLLECTION_NAME:-company_knowledge_base}
+    volumes:
+      - ./sample_data:/app/sample_data
+      - ./chroma_db:/app/chroma_db
+      - ./.env:/app/.env
+    depends_on:
+      ollama:
+        condition: service_healthy
+
+volumes:
+  ollama:

@@ -1,0 +1,67 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Company RAG Chatbot (Local Ollama)</title>
+  <link rel="stylesheet" href="/static/styles.css" />
+</head>
+<body>
+  <div class="container">
+    <h1>🏢 Company Chatbot (Local)</h1>
+    <p class="muted">Ask questions about your company documents. Data stays on your machine.</p>
+
+    <div id="chat" class="chat"></div>
+
+    <form id="ask-form">
+      <input id="question" type="text" placeholder="Type your question about the docs..." autocomplete="off" />
+      <button type="submit">Ask</button>
+    </form>
+  </div>
+
+  <script>
+    const chat = document.getElementById('chat');
+    const form = document.getElementById('ask-form');
+    const q = document.getElementById('question');
+
+    function addBubble(text, who) {
+      const wrap = document.createElement('div');
+      wrap.className = 'bubble ' + (who === 'user' ? 'user' : 'bot');
+      wrap.innerHTML = text.replace(/\n/g, '<br/>');
+      chat.appendChild(wrap);
+      chat.scrollTop = chat.scrollHeight;
+    }
+
+    form.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const question = q.value.trim();
+      if (!question) return;
+      addBubble(question, 'user');
+      q.value = '';
+
+      addBubble('Thinking…', 'bot');
+
+      try {
+        const res = await fetch('/api/chat', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ question })
+        });
+        const data = await res.json();
+        chat.removeChild(chat.lastChild); // remove "Thinking…"
+        if (data.error) {
+          addBubble('Error: ' + data.error, 'bot');
+        } else {
+          const cited = data.sources && data.sources.length
+            ? `<div class="sources"><strong>Sources:</strong> ${data.sources.map(s => `<code>${s}</code>`).join(' ')}</div>`
+            : '';
+          addBubble(data.answer + cited, 'bot');
+        }
+      } catch (err) {
+        chat.removeChild(chat.lastChild);
+        addBubble('Request failed. Is the Flask server and Ollama running?', 'bot');
+      }
+    });
+  </script>
+</body>
+</html>
